@@ -1,0 +1,40 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            Int           @id @default(autoincrement())
+  email         String        @unique @db.VarChar(100)
+  password      String        @db.VarChar(100)
+  name          String        @db.VarChar(50)
+  phone         String        @db.VarChar(12) // - 없이 저장
+  role          Role          @default(USER) // admin, manager, user
+  isVerified    Boolean       @default(false) @map("is_verified") // 유저 인증 여부
+  oauthProvider OAuthProvider @default(LOCAL) @map("oauth_provider") // local은 일반 회원가입
+  isDeleted     Boolean       @default(false) @map("is_deleted")
+  deletedAt     DateTime?     @map("deleted_at") // CS 용도이므로 is_deleted를 사용할 것
+  createdAt     DateTime      @default(now()) @map("created_at")
+  updatedAt     DateTime      @updatedAt @map("updated_at")
+
+  @@map("users")
+}
+
+enum Role {
+  ADMIN   @map("admin")
+  MANAGER @map("manager")
+  USER    @map("user")
+}
+
+enum OAuthProvider {
+  LOCAL  @map("local")
+  GOOGLE @map("google")
+  KAKAO  @map("kakao")
+}
